@@ -1,0 +1,241 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Aperçu OLDating</title><style>
+/* =====================================================================
+   OLDating — Application de rencontre amicale entre seniors
+   Design type application mobile (inspiration Tinder), adapté seniors :
+   grandes polices, forts contrastes, gros boutons, icônes (pas d'émoji).
+   ===================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap');
+
+:root{
+    --grad: linear-gradient(135deg,#FD267A 0%,#FF7854 100%);
+    --grad-soft: linear-gradient(160deg,#fff1f4 0%,#fff6f0 100%);
+    --rose:#FD267A; --orange:#FF7854;
+    --texte:#3a2b34; --gris:#8a7f86;
+    --ok:#1e9e6a; --ok-bg:#e3f7ee; --ko:#d92a4b; --ko-bg:#fdeaee; --info:#2f6fed;
+    --ombre:0 10px 26px rgba(253,38,122,.14);
+    --ombre-fort:0 18px 45px rgba(253,38,122,.28);
+    --radius:24px;
+}
+*{box-sizing:border-box;}
+body{
+    margin:0;color:var(--texte);font-family:'Nunito',sans-serif;font-size:18px;line-height:1.55;
+    background:
+        radial-gradient(circle at 15% 12%,rgba(253,38,122,.18),transparent 40%),
+        radial-gradient(circle at 85% 88%,rgba(255,120,84,.20),transparent 45%),
+        #f2e9ec;
+    min-height:100vh;
+}
+.ico{vertical-align:middle;flex:none;}
+
+/* ---------- Coquille d'application (façon téléphone) ---------- */
+.app{
+    max-width:460px;margin:0 auto;min-height:100vh;background:#fff;
+    position:relative;display:flex;flex-direction:column;
+    padding-bottom:92px;box-shadow:0 0 60px rgba(0,0,0,.12);overflow:hidden;
+}
+.topbar{
+    position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    padding:16px;border-bottom:1px solid #f3e2e9;
+}
+.topbar .back{position:absolute;left:14px;color:var(--rose);display:flex;}
+.logo{font-family:'Fredoka',sans-serif;font-weight:700;font-size:1.5em;
+    background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+
+/* ---------- Barre de navigation inférieure ---------- */
+.bottom-nav{
+    position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+    width:100%;max-width:460px;display:flex;background:#fff;
+    border-top:1px solid #f0dde6;padding:8px 6px;z-index:30;
+}
+.nav-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+    color:var(--gris);font-size:.72em;font-weight:700;text-decoration:none;padding:4px 0;
+}
+.nav-item span{font-family:'Nunito',sans-serif;}
+.nav-item.actif{color:var(--rose);}
+.nav-item.actif .ico{filter:drop-shadow(0 3px 6px rgba(253,38,122,.4));}
+.nav-item:hover{color:var(--rose);text-decoration:none;}
+
+/* =====================================================================
+   ÉCRAN DÉCOUVRIR — deck de cartes swipeables
+   ===================================================================== */
+.deck-zone{flex:1;display:flex;flex-direction:column;padding:16px 16px 0;}
+.deck{position:relative;flex:1;min-height:460px;}
+.swipe-card{
+    position:absolute;inset:0;background:#fff;border-radius:var(--radius);overflow:hidden;
+    box-shadow:0 14px 40px rgba(0,0,0,.18);border:1px solid #eee;
+    display:flex;flex-direction:column;cursor:grab;user-select:none;
+}
+.swipe-card:active{cursor:grabbing;}
+.card-photo{
+    position:relative;flex:1;min-height:55%;
+    background:var(--grad);display:flex;align-items:center;justify-content:center;
+}
+.card-photo img{width:100%;height:100%;object-fit:cover;}
+.avatar-initiale{font-family:'Fredoka',sans-serif;font-size:7em;font-weight:700;color:rgba(255,255,255,.95);}
+.card-infos{padding:18px 20px 22px;}
+.card-infos h2{text-align:left;margin:0 0 6px;font-size:1.7em;color:var(--texte);}
+.card-infos h2 .age{font-weight:600;color:var(--gris);font-size:.8em;}
+.card-infos .ville{display:flex;align-items:center;gap:6px;color:var(--gris);margin:0 0 10px;font-weight:700;}
+.card-infos .bio{margin:0 0 12px;color:#5a4d54;}
+.chips{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{background:var(--grad-soft);border:1px solid #f6cdda;color:var(--rose);
+    border-radius:50px;padding:6px 14px;font-weight:700;font-size:.85em;}
+
+.badge-like,.badge-nope{
+    position:absolute;top:24px;font-family:'Fredoka',sans-serif;font-weight:700;font-size:1.8em;
+    padding:6px 16px;border:4px solid;border-radius:12px;opacity:0;transition:opacity .1s;pointer-events:none;
+}
+.badge-like{left:20px;color:#1e9e6a;border-color:#1e9e6a;transform:rotate(-15deg);}
+.badge-nope{right:20px;color:#fff;border-color:#fff;transform:rotate(15deg);}
+
+.deck-vide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:14px;color:var(--gris);text-align:center;}
+
+/* ---------- Boutons d'action ronds ---------- */
+.swipe-actions{display:flex;justify-content:center;align-items:center;gap:22px;padding:20px 0 8px;}
+.rond{width:64px;height:64px;border-radius:50%;border:none;background:#fff;color:var(--gris);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    box-shadow:0 8px 20px rgba(0,0,0,.16);transition:transform .15s,box-shadow .15s;}
+.rond:hover{transform:scale(1.1);box-shadow:var(--ombre-fort);}
+.rond.pass{color:var(--ko);}
+.rond.message{color:var(--info);}
+.rond.like{width:74px;height:74px;background:var(--grad);color:#fff;}
+
+/* ---------- Toast ---------- */
+.toast{position:fixed;bottom:108px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:#2b2230;color:#fff;padding:14px 20px;border-radius:50px;font-weight:700;
+    box-shadow:var(--ombre-fort);opacity:0;pointer-events:none;transition:.3s;z-index:40;max-width:90%;}
+.toast.visible{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+.toast a{color:#ffd0e0;}
+
+/* =====================================================================
+   PAGES CLASSIQUES (événements, messagerie, profil, admin)
+   ===================================================================== */
+.page{padding:18px 16px;flex:1;}
+.container{max-width:460px;margin:0 auto;padding:18px 16px;}
+.box{background:#fff;padding:24px 22px;margin-bottom:20px;border-radius:var(--radius);
+    box-shadow:var(--ombre);border:1px solid #fbe4ec;animation:monter .45s ease both;}
+@keyframes monter{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+
+h1,h2,h3{font-family:'Fredoka',sans-serif;text-align:center;margin-top:0;line-height:1.2;}
+h1{font-size:1.9em;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;}
+h2{font-size:1.45em;color:var(--rose);}
+h3{font-size:1.2em;}
+a{color:var(--rose);text-decoration:none;font-weight:700;}
+a:hover{text-decoration:underline;}
+
+form{display:flex;flex-direction:column;gap:14px;margin-top:16px;}
+label{font-weight:700;font-size:.95em;}
+input[type=text],input[type=email],input[type=password],input[type=date],
+input[type=datetime-local],input[type=number],select,textarea{
+    padding:15px 18px;border:2px solid #f2d6df;border-radius:16px;width:100%;font-size:1em;
+    font-family:'Nunito',sans-serif;background:#fffafb;transition:border-color .2s,box-shadow .2s;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--rose);box-shadow:0 0 0 4px rgba(253,38,122,.12);}
+textarea{resize:vertical;min-height:90px;}
+
+input[type=submit],button,.btn,.btn-deconnexion,.btn-notif{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    font-family:'Fredoka',sans-serif;font-size:1.05em;font-weight:600;color:#fff !important;
+    background:var(--grad);border:none;border-radius:50px;padding:15px 26px;cursor:pointer;
+    text-align:center;box-shadow:var(--ombre);transition:transform .15s,box-shadow .15s,filter .15s;}
+input[type=submit]:hover,button:hover,.btn:hover,.btn-deconnexion:hover,.btn-notif:hover{
+    transform:translateY(-3px) scale(1.02);box-shadow:var(--ombre-fort);filter:brightness(1.05);text-decoration:none;}
+.btn-deconnexion{background:#fff;color:var(--rose) !important;border:2px solid var(--rose);box-shadow:none;margin-top:12px;}
+.btn-deconnexion:hover{background:var(--grad-soft);}
+
+ul{list-style:none;padding:0;margin:16px 0;}
+ul li{margin:0 0 12px;}
+.nav-link{display:flex;align-items:center;gap:12px;background:var(--grad-soft);border:1px solid #fbdde7;
+    border-radius:18px;padding:18px 20px;font-size:1.1em;font-weight:700;color:var(--texte) !important;
+    transition:transform .15s,box-shadow .15s;}
+.nav-link:hover{transform:translateX(6px);box-shadow:var(--ombre);color:var(--rose) !important;text-decoration:none;}
+.nav-link .ico{color:var(--rose);}
+
+.event-card{position:relative;background:#fff;border-radius:20px;padding:20px 22px 20px 28px;
+    margin-bottom:16px !important;box-shadow:0 8px 22px rgba(0,0,0,.06);border:1px solid #f3e3e9;
+    overflow:hidden;transition:transform .18s,box-shadow .18s;}
+.event-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:8px;background:var(--grad);}
+.event-card:hover{transform:translateY(-4px) rotate(-.4deg);box-shadow:var(--ombre-fort);}
+.event-card strong{font-size:1.2em;font-family:'Fredoka',sans-serif;}
+
+.success-message,.error-message{border-radius:16px;padding:13px 18px;font-weight:700;margin-bottom:14px;
+    text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;}
+.success-message{background:var(--ok-bg);color:var(--ok);border:1px solid #b6e8d0;}
+.error-message{background:var(--ko-bg);color:var(--ko);border:1px solid #f5c3ce;}
+
+.notification-box{background:var(--grad-soft);border:1px dashed var(--orange);border-radius:18px;padding:14px 20px;margin-bottom:18px;}
+.notification-box li{margin-bottom:10px;}
+.btn-notif{padding:8px 16px;font-size:.85em;}
+.inactif{display:inline-block;background:var(--ko-bg);color:var(--ko);border-radius:50px;padding:3px 12px;font-weight:800;font-size:.78em;margin-left:6px;}
+
+/* ---------- Messagerie ---------- */
+.chat-liste{display:flex;flex-direction:column;gap:8px;}
+.contact{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:#fff;
+    border:1px solid #f1e0e7;cursor:pointer;color:var(--texte);font-weight:700;}
+.contact:hover{background:var(--grad-soft);text-decoration:none;}
+.avatar{width:48px;height:48px;border-radius:50%;background:var(--grad);color:#fff;flex:none;
+    display:flex;align-items:center;justify-content:center;font-family:'Fredoka',sans-serif;font-size:1.2em;}
+.pastille{width:12px;height:12px;border-radius:50%;margin-left:auto;}
+.pastille.en{background:#1e9e6a;} .pastille.abs{background:#f0a500;} .pastille.npd{background:var(--ko);} .pastille.off{background:#bbb;}
+
+.messages_box{background:var(--grad-soft) !important;border:1px solid #fbdde7 !important;border-radius:20px !important;
+    padding:16px !important;display:flex;flex-direction:column;}
+.message{padding:12px 16px;margin:7px 0;border-radius:20px;max-width:80%;word-wrap:break-word;font-size:1.05em;
+    box-shadow:0 3px 8px rgba(0,0,0,.05);animation:monter .25s ease both;}
+.message span{font-weight:800;font-size:.76em;display:block;opacity:.8;}
+.message p{margin:4px 0 0;}
+.message .date{font-size:.72em;color:var(--gris);margin-top:4px;}
+.your_message{background:var(--grad);color:#fff;margin-left:auto;border-bottom-right-radius:6px;text-align:right;}
+.your_message .date{color:rgba(255,255,255,.85);}
+.others_message{background:#fff;color:var(--texte);margin-right:auto;border-bottom-left-radius:6px;border:1px solid #f0e0e6;}
+
+/* ---------- Authentification ---------- */
+.auth-container{display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;}
+.auth-box{background:#fff;padding:40px 34px;border-radius:28px;box-shadow:var(--ombre-fort);width:100%;max-width:420px;animation:monter .6s ease both;}
+.auth-logo{font-family:'Fredoka',sans-serif;font-weight:700;font-size:2.6em;text-align:center;
+    background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin:0;}
+.auth-sub{text-align:center;color:var(--gris);margin:0 0 18px;}
+.password-container{position:relative;}
+.toggle-password{position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--gris);display:flex;}
+.forgot-password{text-align:right;margin-top:4px;}
+.forgot-password a{font-size:.9em;}
+
+@media(max-width:480px){.app{max-width:100%;box-shadow:none;}.bottom-nav{max-width:100%;}}
+body{background:#f2e9ec;padding:26px;}
+.row{display:flex;gap:30px;justify-content:center;align-items:flex-start;flex-wrap:wrap;}
+.frame{width:430px;border:9px solid #2b2230;border-radius:40px;overflow:hidden;background:#fff;box-shadow:0 20px 50px rgba(0,0,0,.25);}
+.frame .app{box-shadow:none;min-height:auto;padding-bottom:0;max-width:100%;}
+.frame .deck{min-height:430px;}.frame .bottom-nav{position:static;transform:none;width:100%;}
+</style></head><body>
+<div class="row">
+  <div class="frame"><div class="app">
+    <header class="topbar"><span class="logo">OLDating</span></header>
+    <div class="deck-zone"><div class="deck">
+      <article class="swipe-card">
+        <div class="card-photo"><span class="avatar-initiale">C</span><div class="badge-like" style="opacity:1">J'AIME</div></div>
+        <div class="card-infos"><h2>Chantal <span class="age">67</span></h2>
+          <p class="ville"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> Noisy-le-Grand</p>
+          <p class="bio">Passionnée de jardinage et de scrabble.</p>
+          <div class="chips"><span class="chip">Scrabble</span><span class="chip">Échecs</span><span class="chip">Jazz</span></div>
+        </div>
+      </article>
+    </div>
+    <div class="swipe-actions"><button class="rond pass"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="rond like"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg></button><button class="rond message"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-9 8.3L4 21l1.2-3.6A8.38 8.38 0 1 1 21 11.5z"/></svg></button></div>
+    </div>
+    <nav class="bottom-nav"><a class="nav-item actif"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3-1 5-2 6 0 0 0-2-2-3 1 4-3 5-3 9a7 7 0 0 0 14 0c0-4-3-6-3-9-1 2-3 2-3 2 1-2 2-3 2-5z"/></svg><span>Découvrir</span></a><a class="nav-item"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Événements</span></a><a class="nav-item"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-9 8.3L4 21l1.2-3.6A8.38 8.38 0 1 1 21 11.5z"/></svg><span>Messages</span></a><a class="nav-item"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Profil</span></a></nav>
+  </div></div>
+  <div class="frame"><div class="app">
+    <header class="topbar"><span class="logo">André</span></header>
+    <div class="page"><div class="messages_box" style="min-height:330px;">
+      <div class="message others_message"><span>Lui</span><p>Bonjour Chantal, on se voit à la galette ?</p><p class="date">10:15</p></div>
+      <div class="message your_message"><span>Vous</span><p>Avec plaisir André, j'y serai !</p><p class="date">10:20</p></div>
+      <div class="message others_message"><span>Lui</span><p>Super, à très vite !</p><p class="date">10:21</p></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px;align-items:flex-end;"><textarea style="min-height:54px;flex:1;">Très bien, à samedi !</textarea><button style="padding:15px;border-radius:50%;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-9 8.3L4 21l1.2-3.6A8.38 8.38 0 1 1 21 11.5z"/></svg></button></div>
+    </div>
+    <nav class="bottom-nav"><a class="nav-item"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3-1 5-2 6 0 0 0-2-2-3 1 4-3 5-3 9a7 7 0 0 0 14 0c0-4-3-6-3-9-1 2-3 2-3 2 1-2 2-3 2-5z"/></svg><span>Découvrir</span></a><a class="nav-item"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Événements</span></a><a class="nav-item actif"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-9 8.3L4 21l1.2-3.6A8.38 8.38 0 1 1 21 11.5z"/></svg><span>Messages</span></a><a class="nav-item"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Profil</span></a></nav>
+  </div></div>
+</div></body></html>
