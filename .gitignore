@@ -1,0 +1,12 @@
+# Configuration locale (identifiants)
+.env
+.env.local
+
+# Fichiers temporaires de PowerPoint / Word
+~$*
+
+# Éditeurs et système
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
